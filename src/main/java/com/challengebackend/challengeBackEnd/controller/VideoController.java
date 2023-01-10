@@ -1,16 +1,15 @@
 package com.challengebackend.challengeBackEnd.controller;
 
-import com.challengebackend.challengeBackEnd.domain.DadosListagemTodosVideos;
-import com.challengebackend.challengeBackEnd.domain.Video;
-import com.challengebackend.challengeBackEnd.domain.VideoRepository;
+import com.challengebackend.challengeBackEnd.domain.video.*;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/videos")
@@ -25,6 +24,23 @@ public class VideoController {
                 .findAll(paginacao)
                 .map(DadosListagemTodosVideos::new);
         return ResponseEntity.ok(page);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<DadosListagemVideo> listarVideo(@PathVariable Long id) {
+        var video = videoRepository
+                .getReferenceById(id);
+        return ResponseEntity.ok(new DadosListagemVideo(video));
+    }
+
+    @PostMapping
+    @Transactional
+    public ResponseEntity<DadosListagemVideo> cadastrarVideo(@RequestBody @Valid DadosCadastroVideo dados, UriComponentsBuilder builder) {
+        var video = new Video(dados);
+        videoRepository.save(video);
+        var uri = builder.path("/videos/{id}").buildAndExpand(video.getId()).toUri();
+
+        return ResponseEntity.created(uri).body(new DadosListagemVideo(video));
     }
 
 }

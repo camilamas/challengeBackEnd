@@ -1,4 +1,4 @@
-package com.challengebackend.challengeBackEnd.domain;
+package com.challengebackend.challengeBackEnd.domain.video;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -21,4 +21,9 @@ public class Video {
     private String descricao;
     private String url;
 
+    public Video(DadosCadastroVideo dados) {
+        this.titulo = dados.titulo();
+        this.descricao = dados.descricao();
+        this.url = dados.url();
+    }
 }
