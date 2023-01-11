@@ -43,4 +43,20 @@ public class VideoController {
         return ResponseEntity.created(uri).body(new DadosListagemVideo(video));
     }
 
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity excluir(@PathVariable Long id) {
+        var video = videoRepository.getReferenceById(id);
+        videoRepository.delete(video);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping
+    @Transactional
+    public ResponseEntity atualizar(@RequestBody @Valid DadosAtualizacaoVideo dados) {
+        var video = videoRepository.getReferenceById(dados.id());
+        video.atualizarInformacoes(dados);
+        return ResponseEntity.ok(new DadosListagemVideo(video));
+    }
+
 }
