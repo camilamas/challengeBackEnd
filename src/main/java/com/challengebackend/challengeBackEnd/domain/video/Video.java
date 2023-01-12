@@ -30,8 +30,8 @@ public class Video {
     }
 
     public void atualizarInformacoes(DadosAtualizacaoVideo dados) {
-        if(dados.titulo() != null) this.titulo = dados.titulo();
-        if(dados.descricao() != null) this.descricao = dados.descricao();
-        if(dados.url() != null) this.url = dados.url();
+        if (dados.titulo() != null) this.titulo = dados.titulo();
+        if (dados.descricao() != null) this.descricao = dados.descricao();
+        if (dados.url() != null) this.url = dados.url();
     }
 }

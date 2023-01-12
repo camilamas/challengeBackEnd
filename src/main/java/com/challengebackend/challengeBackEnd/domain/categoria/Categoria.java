@@ -1,6 +1,5 @@
 package com.challengebackend.challengeBackEnd.domain.categoria;
 
-import com.challengebackend.challengeBackEnd.domain.video.DadosCadastroVideo;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -26,5 +25,10 @@ public class Categoria {
     public Categoria(DadosCadastroCategoria dados) {
         this.titulo = dados.titulo();
         this.cor = dados.cor();
+    }
+
+    public void atualizarInformacoes(DadosAtualizacaoCategoria dados) {
+        if (dados.titulo() != null) this.titulo = dados.titulo();
+        if (dados.cor() != null) this.cor = dados.cor();
     }
 }

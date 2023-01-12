@@ -1,8 +1,7 @@
 package com.challengebackend.challengeBackEnd.controller;
 
 import com.challengebackend.challengeBackEnd.domain.categoria.*;
-import com.challengebackend.challengeBackEnd.domain.video.DadosCadastroVideo;
-import com.challengebackend.challengeBackEnd.domain.video.DadosListagemTodosVideos;
+import com.challengebackend.challengeBackEnd.domain.video.VideoRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,8 +19,11 @@ public class CategoriaController {
     @Autowired
     private CategoriaRepository categoriaRepository;
 
+    @Autowired
+    private VideoRepository videoRepository;
+
     @GetMapping
-    public ResponseEntity<Page<DadosListagemTodasCategorias>> listarTodosVideos(@PageableDefault(size=10) Pageable paginacao) {
+    public ResponseEntity<Page<DadosListagemTodasCategorias>> listarTodosVideos(@PageableDefault(size = 10) Pageable paginacao) {
         var page = categoriaRepository.findAll(paginacao).map(DadosListagemTodasCategorias::new);
         return ResponseEntity.ok(page);
     }
@@ -32,6 +34,14 @@ public class CategoriaController {
         return ResponseEntity.ok(new DadosListagemCategoria(categoria));
     }
 
+    @GetMapping("/{id}/videos")
+    public ResponseEntity<Page<DadosListagemVideosPorCategoria>> listarVideosPorCategoria(@PathVariable Long id, @PageableDefault(size = 10) Pageable paginacao) {
+        var categoria = categoriaRepository.getReferenceById(id);
+        var page = videoRepository.findAllById(paginacao, id).map((video) -> new DadosListagemVideosPorCategoria(video, categoria));
+        return ResponseEntity.ok(page);
+
+    }
+
     @PostMapping
     @Transactional
     public ResponseEntity<DadosListagemCategoria> cadastrarCategoria(@RequestBody @Valid DadosCadastroCategoria dados, UriComponentsBuilder builder) {
@@ -40,5 +50,22 @@ public class CategoriaController {
         var uri = builder.path("categoria/{id}").buildAndExpand(categoria.getId()).toUri();
         return ResponseEntity.created(uri).body(new DadosListagemCategoria(categoria));
     }
+
+    @PutMapping
+    @Transactional
+    public ResponseEntity<DadosListagemCategoria> atualizarCategoria(@RequestBody @Valid DadosAtualizacaoCategoria dados) {
+        var categoria = categoriaRepository.getReferenceById(dados.id());
+        categoria.atualizarInformacoes(dados);
+        return ResponseEntity.ok(new DadosListagemCategoria(categoria));
+    }
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity excluirCategoria(@PathVariable Long id) {
+        var categoria = categoriaRepository.getReferenceById(id);
+        categoriaRepository.delete(categoria);
+        return ResponseEntity.noContent().build();
+    }
+
 
 }
