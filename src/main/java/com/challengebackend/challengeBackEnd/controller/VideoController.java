@@ -20,9 +20,7 @@ public class VideoController {
 
     @GetMapping
     public ResponseEntity<Page<DadosListagemTodosVideos>> listarTodosVideos(@PageableDefault(size=10) Pageable paginacao) {
-        var page = videoRepository
-                .findAll(paginacao)
-                .map(DadosListagemTodosVideos::new);
+        var page = videoRepository.findAll(paginacao).map(DadosListagemTodosVideos::new);
         return ResponseEntity.ok(page);
     }
 
