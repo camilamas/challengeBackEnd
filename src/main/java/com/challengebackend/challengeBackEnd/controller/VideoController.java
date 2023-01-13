@@ -1,7 +1,11 @@
 package com.challengebackend.challengeBackEnd.controller;
 
+import com.challengebackend.challengeBackEnd.ChallengeBackEndApplication;
+import com.challengebackend.challengeBackEnd.domain.categoria.CategoriaRepository;
 import com.challengebackend.challengeBackEnd.domain.video.*;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,12 +19,25 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RequestMapping("/videos")
 public class VideoController {
 
+    private static Logger logger = LoggerFactory.getLogger(ChallengeBackEndApplication.class);
+
     @Autowired
     private VideoRepository videoRepository;
 
+    @Autowired
+    private CategoriaRepository categoriaRepository;
+
     @GetMapping
-    public ResponseEntity<Page<DadosListagemTodosVideos>> listarTodosVideos(@PageableDefault(size = 10) Pageable paginacao) {
+    public ResponseEntity<Page<DadosListagemTodosVideos>> listarTodosVideos(@PageableDefault(size = 10) Pageable paginacao, @RequestParam(required=false) String search) {
         var page = videoRepository.findAll(paginacao).map(DadosListagemTodosVideos::new);
+        if (search != null) {
+            var categoria = categoriaRepository.getReferenceByTitulo(search.toUpperCase());
+            if(categoria != null) {
+                page = videoRepository.findByCategoriaId(paginacao, categoria.getId()).map(DadosListagemTodosVideos::new);
+            } else {
+                return ResponseEntity.noContent().build();
+            }
+        }
         return ResponseEntity.ok(page);
     }
 

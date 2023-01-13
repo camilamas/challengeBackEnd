@@ -37,9 +37,8 @@ public class CategoriaController {
     @GetMapping("/{id}/videos")
     public ResponseEntity<Page<DadosListagemVideosPorCategoria>> listarVideosPorCategoria(@PathVariable Long id, @PageableDefault(size = 10) Pageable paginacao) {
         var categoria = categoriaRepository.getReferenceById(id);
-        var page = videoRepository.findAllById(paginacao, id).map((video) -> new DadosListagemVideosPorCategoria(video, categoria));
+        var page = videoRepository.findByCategoriaId(paginacao, id).map((video) -> new DadosListagemVideosPorCategoria(video, categoria));
         return ResponseEntity.ok(page);
-
     }
 
     @PostMapping
